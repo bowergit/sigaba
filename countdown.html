@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 40%, #1a237e 0%, #050614 70%);
+    font-family: 'Georgia', serif;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  .stage {
+    text-align: center;
+  }
+
+  #number {
+    font-size: min(40vw, 22rem);
+    font-weight: bold;
+    line-height: 1;
+    color: #ffd700;
+    text-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+  }
+
+  #number.pop {
+    animation: pop 0.8s ease-out;
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(0.4); opacity: 0; }
+    30%  { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  #start-btn {
+    font-family: inherit;
+    font-size: 1.5rem;
+    padding: 20px 48px;
+    border: none;
+    border-radius: 50px;
+    background: #ffd700;
+    color: #1a237e;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
+    transition: transform 0.15s ease;
+  }
+
+  #start-btn:hover { transform: scale(1.05); }
+  #start-btn:active { transform: scale(0.97); }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <button id="start-btn">Start</button>
+    <div id="number" class="hidden"></div>
+  </div>
+
+  <audio id="sound" src="countdown-sound.mp3" preload="auto"></audio>
+
+  <script>
+    const startBtn = document.getElementById('start-btn');
+    const numberEl = document.getElementById('number');
+    const sound = document.getElementById('sound');
+    const sequence = [5, 4, 3, 2, 1];
+    const stepMs = 800;
+
+    startBtn.addEventListener('click', () => {
+      // Unlock audio playback on mobile browsers by priming it
+      // inside this user-gesture click, before the countdown delays fire.
+      sound.play().then(() => sound.pause()).catch(() => {});
+      sound.currentTime = 0;
+
+      startBtn.classList.add('hidden');
+      numberEl.classList.remove('hidden');
+
+      sequence.forEach((value, i) => {
+        setTimeout(() => {
+          numberEl.textContent = value;
+          numberEl.classList.remove('pop');
+          void numberEl.offsetWidth; // restart animation
+          numberEl.classList.add('pop');
+        }, i * stepMs);
+      });
+
+      setTimeout(() => {
+        sound.currentTime = 0;
+        sound.play();
+      }, sequence.length * stepMs);
+    });
+  </script>
+</body>
+</html>
