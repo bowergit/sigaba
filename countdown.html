@@ -40,7 +40,22 @@
     100% { transform: scale(1); opacity: 1; }
   }
 
-  #start-btn {
+  #emoji {
+    font-size: min(40vw, 18rem);
+    line-height: 1;
+    display: inline-block;
+    animation: dance 0.5s ease-in-out infinite;
+  }
+
+  @keyframes dance {
+    0%   { transform: rotate(-15deg) scale(1); }
+    25%  { transform: rotate(10deg) scale(1.1); }
+    50%  { transform: rotate(-10deg) scale(0.95); }
+    75%  { transform: rotate(15deg) scale(1.1); }
+    100% { transform: rotate(-15deg) scale(1); }
+  }
+
+  button {
     font-family: inherit;
     font-size: 1.5rem;
     padding: 20px 48px;
@@ -54,8 +69,12 @@
     transition: transform 0.15s ease;
   }
 
-  #start-btn:hover { transform: scale(1.05); }
-  #start-btn:active { transform: scale(0.97); }
+  button:hover { transform: scale(1.05); }
+  button:active { transform: scale(0.97); }
+
+  #reset-btn {
+    margin-top: 30px;
+  }
 
   .hidden { display: none; }
 </style>
@@ -64,16 +83,32 @@
   <div class="stage">
     <button id="start-btn">Start</button>
     <div id="number" class="hidden"></div>
+    <div id="emoji" class="hidden"></div>
+    <div>
+      <button id="reset-btn" class="hidden">Reset</button>
+    </div>
   </div>
 
   <audio id="sound" src="countdown-sound.mp3" preload="auto"></audio>
 
   <script>
     const startBtn = document.getElementById('start-btn');
+    const resetBtn = document.getElementById('reset-btn');
     const numberEl = document.getElementById('number');
+    const emojiEl = document.getElementById('emoji');
     const sound = document.getElementById('sound');
     const sequence = [5, 4, 3, 2, 1];
     const stepMs = 800;
+    const emojis = ['💩', '🕺', '💃', '🎉', '🦄', '🐸', '🤖', '👻', '🎃', '👽', '🍕', '🐒'];
+
+    function reset() {
+      sound.pause();
+      sound.currentTime = 0;
+      numberEl.classList.add('hidden');
+      emojiEl.classList.add('hidden');
+      resetBtn.classList.add('hidden');
+      startBtn.classList.remove('hidden');
+    }
 
     startBtn.addEventListener('click', () => {
       // Unlock audio playback on mobile browsers by priming it
@@ -94,10 +129,16 @@
       });
 
       setTimeout(() => {
+        numberEl.classList.add('hidden');
+        emojiEl.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        emojiEl.classList.remove('hidden');
+        resetBtn.classList.remove('hidden');
         sound.currentTime = 0;
         sound.play();
       }, sequence.length * stepMs);
     });
+
+    resetBtn.addEventListener('click', reset);
   </script>
 </body>
 </html>
